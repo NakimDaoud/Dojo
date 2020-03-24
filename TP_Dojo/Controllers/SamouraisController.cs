@@ -10,6 +10,8 @@ using BO;
 using TP_Dojo.Data;
 using TP_Dojo.Models;
 
+//vm.Armes = db.Armes.Where(a => !db.Samourais.Any(s => s.Arme.Id == a.Id)).Select(a => new SelectListItem { Text = a.Nom, Value = a.Id.ToString() }).ToList();
+
 namespace TP_Dojo.Controllers
 {
     public class SamouraisController : Controller
@@ -34,7 +36,12 @@ namespace TP_Dojo.Controllers
             {
                 return HttpNotFound();
             }
-            return View(samourai);
+
+            SamouraiVM vm = new SamouraiVM();
+            vm.Samourai = samourai;
+            
+            vm.potentiel = calculPotentiel(samourai);
+            return View(vm);
         }
 
         // GET: Samourais/Create
@@ -42,6 +49,7 @@ namespace TP_Dojo.Controllers
         {
             SamouraiVM vm = new SamouraiVM();
             vm.Armes = db.Armes.ToList();
+            vm.ArtMartials = db.ArtMartials.ToList();
             return View(vm);
         }
 
@@ -57,7 +65,27 @@ namespace TP_Dojo.Controllers
 
                 if (samVm.idArme != null)
                 {
-                    samVm.Samourai.Arme = db.Armes.FirstOrDefault(a => a.Id == samVm.idArme);
+
+                    var armeTrouve = db.Samourais.Any(s => s.Arme.Id == samVm.idArme);
+                    if (!armeTrouve)
+                    {
+                        samVm.Samourai.Arme = db.Armes.FirstOrDefault(a => a.Id == samVm.idArme);
+
+                       
+                    }
+                    else {
+                        samVm.Armes = db.Armes.ToList();
+                        samVm.ArtMartials = db.ArtMartials.ToList();
+                        return View(samVm);
+
+                    }
+                }
+
+                if(samVm.idArtMartial.Count > 0)
+                {
+                    samVm.Samourai.ArtMartials= db.ArtMartials.Where(
+                           x => samVm.idArtMartial.Contains(x.Id))
+                           .ToList();
                 }
                 
                 db.Samourais.Add(samVm.Samourai);
@@ -81,9 +109,11 @@ namespace TP_Dojo.Controllers
             {
                 return HttpNotFound();
             }
+
             SamouraiVM samouraiVM = new SamouraiVM();
             samouraiVM.Samourai = samourai;
             samouraiVM.Armes = db.Armes.ToList();
+            samouraiVM.ArtMartials = db.ArtMartials.ToList();
             return View(samouraiVM);
         }
 
@@ -97,10 +127,38 @@ namespace TP_Dojo.Controllers
             if (ModelState.IsValid)
             {
                 var Samourai = db.Samourais.Find(samvm.Samourai.Id);
+               
                 Samourai.Force = samvm.Samourai.Force;
                 Samourai.Nom = samvm.Samourai.Nom;
+                if (samvm.idArme != null)
+                {
+                    if (Samourai.Arme != null && Samourai.Arme.Id == samvm.idArme)
+                    {
 
-                Samourai.Arme = samvm.Samourai.Arme;
+                        Samourai.Arme = samvm.Samourai.Arme;
+                    }
+                    else
+                    {
+                        var armeTrouve = db.Samourais.Any(s => s.Arme.Id == samvm.idArme);
+                        if (!armeTrouve)
+                        {
+                            Samourai.Arme = db.Armes.FirstOrDefault(a => a.Id == samvm.idArme);
+                        }
+                        else
+                        {
+                            samvm.Armes = db.Armes.ToList();
+                            samvm.ArtMartials = db.ArtMartials.ToList();
+                            return View(samvm);
+                        }
+
+                    }
+                }
+                else
+                {
+                    Samourai.Arme = null;
+                    db.Entry(Samourai).State = EntityState.Modified;
+                    
+                }
 
                 db.SaveChanges();
                 return RedirectToAction("Index");
@@ -119,11 +177,18 @@ namespace TP_Dojo.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             Samourai samourai = db.Samourais.Find(id);
+
+           
+
             if (samourai == null)
             {
                 return HttpNotFound();
             }
-            return View(samourai);
+            SamouraiVM vm = new SamouraiVM();
+            vm.Samourai = samourai;
+
+            vm.potentiel = calculPotentiel(samourai);
+            return View(vm);
         }
 
         // POST: Samourais/Delete/5
@@ -131,7 +196,16 @@ namespace TP_Dojo.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
+
+
             Samourai samourai = db.Samourais.Find(id);
+            
+            if (samourai.Arme != null)
+            {
+                ModelState.AddModelError("", "Impossible de supprimer cette arme car elle est utilisée par des Samourais");
+                return View(db.Samourais.Find(id));
+            }
+
             db.Samourais.Remove(samourai);
             db.SaveChanges();
             return RedirectToAction("Index");
@@ -144,6 +218,20 @@ namespace TP_Dojo.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        private int calculPotentiel(Samourai samourai)
+        {
+            int force = samourai.Force;
+
+            int degat = 0;
+            if (samourai.Arme != null)
+            {
+                degat = samourai.Arme.Degats;
+            }
+            int nbArt = samourai.ArtMartials.Count + 1;
+  
+            return (force + degat) * nbArt;
         }
     }
 }

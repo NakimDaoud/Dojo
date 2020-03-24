@@ -1,30 +1,53 @@
-﻿@model BO.Samourai
+﻿@model TP_Dojo.Models.SamouraiVM
 
 <h4>Samourai</h4>
 <hr />
 <dl class="dl-horizontal">
     <dt>
-        @Html.DisplayNameFor(model => model.Force)
+        @Html.DisplayNameFor(model => model.Samourai.Force)
     </dt>
 
     <dd>
-        @Html.DisplayFor(model => model.Force)
+        @Html.DisplayFor(model => model.Samourai.Force)
     </dd>
 
     <dt>
-        @Html.DisplayNameFor(model => model.Nom)
+        @Html.DisplayNameFor(model => model.Samourai.Nom)
     </dt>
 
     <dd>
-        @Html.DisplayFor(model => model.Nom)
+        @Html.DisplayFor(model => model.Samourai.Nom)
     </dd>
 
     <dt>
-        @Html.DisplayNameFor(model => model.Arme)
+        @Html.DisplayNameFor(model => model.Samourai.Arme)
     </dt>
 
     <dd>
-        @Html.DisplayFor(model => model.Arme.Nom)
+        @Html.DisplayFor(model => model.Samourai.Arme.Nom)
     </dd>
+
+    <dt>
+        @Html.DisplayNameFor(model => model.Samourai.ArtMartials)
+    </dt>
+
+    <dd>
+        @if (Model.Samourai.ArtMartials != null)
+        {
+            foreach (var artMartial in Model.Samourai.ArtMartials)
+            {
+                @Html.DisplayFor(i => artMartial.Nom) <br />
+            }
+        }
+    </dd>
+
+    <dt>
+        Potentiel
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(model => model.potentiel)
+    </dd>
+
 
 </dl>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BO;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -19,8 +20,15 @@ namespace TP_Dojo.Data
         {
         }
 
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+        }
+
         public System.Data.Entity.DbSet<BO.Samourai> Samourais { get; set; }
 
         public System.Data.Entity.DbSet<BO.Arme> Armes { get; set; }
+
+        public System.Data.Entity.DbSet<BO.ArtMartial> ArtMartials { get; set; }
     }
 }

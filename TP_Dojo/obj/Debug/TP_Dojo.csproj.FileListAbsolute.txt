@@ -92,3 +92,4 @@ C:\Users\daoud\source\repos\TP_Dojo\TP_Dojo\bin\EntityFramework.xml
 C:\Users\daoud\source\repos\TP_Dojo\TP_Dojo\bin\EntityFramework.SqlServer.xml
 C:\Users\daoud\source\repos\TP_Dojo\TP_Dojo\obj\Debug\TP_Dojo.Migrations.deuxieme.resources
 C:\Users\daoud\source\repos\TP_Dojo\TP_Dojo\obj\Debug\TP_Dojo.csproj.GenerateResource.cache
+C:\Users\daoud\source\repos\TP_Dojo\TP_Dojo\obj\Debug\TP_Dojo.Migrations.two.resources
